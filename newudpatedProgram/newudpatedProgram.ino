@@ -10,6 +10,7 @@ String x[8];
 int count1,count3;
 int count2 = 0;
 float newOut=0;
+float cumm03;
 //------------------------------------------
 #include<Wire.h>
 //----------------------RTC Header-------------------------------
@@ -44,6 +45,7 @@ int gsmCount = 0;
 float cumm12,cumm9;
 float cf=0;
 int gsmboot=1;
+float testcumm;
 //********************
   
   //String stringone = "AT+HTTPPARA=\"URL\",\"http://visionworldtech.com/Video/select.php?";
@@ -227,7 +229,7 @@ void loop()
   //-------------------------------- Calculations SCADA -----------------------
   DateTime now = rtc.now();
   float sensorValue = analogRead(A1);
-  outputValue = map(sensorValue,300 , 1023, 0, 21); // 21
+  outputValue = map(sensorValue,310 , 1023, 0,21); // 21
   Serial.print("OutputValue ");
   Serial.println(outputValue);
   Serial.print("Tsec ");
@@ -281,14 +283,22 @@ void loop()
   }
   if(gsmCount==7)
   {
-    if(outputValue>0)
-    {      
-      outputValue= newOut;
-    }
+    
     int id_panel = 889;      
     int ups = 1;
     int door = 1;
-    int current_flow = newOut;
+    int current_flow ;
+    if(outputValue>0)
+    {
+      current_flow= outputValue;
+      
+    }
+    if(outputValue<0)
+    {
+      current_flow= 0;
+      
+    }
+    
     int total_flow = cumm12 * 100;
     int panel_lock = 0;
     int main = 1;
@@ -334,6 +344,8 @@ void loop()
    }    
    if (outputValue<=0)
    {
+      cumm03 = (tsec * 0.0099999988)/10; 
+      lcd.clear();
       newOut=0;
       lcd.setCursor(0, 0);
       lcd.print("CF=");
@@ -342,7 +354,7 @@ void loop()
       lcd.setCursor(0, 1);
       lcd.print("Total =");
       lcd.setCursor(7, 1);
-      lcd.print(cumm3, 3);
+      lcd.print(cumm03, 3);
       delay(10);
    }
    if(outputValue>0)
@@ -354,6 +366,7 @@ void loop()
       cumm3 = (tsec * 0.0099999988)/10;       
       cumm9 = sendTot * 0.0099999988;
       cumm12 = (cumm9/10);
+      
       //==================================Send Value in SD Card==============
       Serial.println("*****SD Value Add Start Value of Last ToT=********");
       SD.remove("file.txt");
@@ -375,6 +388,7 @@ void loop()
       lcd.print("Total =");
       lcd.setCursor(7, 1);
       lcd.print(cumm3, 3);
+      
       delay(10);
       Serial.println("Last LLOp");
       Serial.print("Tsec Value test = ");
