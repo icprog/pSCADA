@@ -233,103 +233,107 @@ void loop()
   Serial.print("Tsec ");
   Serial.println(tsec);
   Serial.print("SendToto ");
-  Serial.println(sendTot);
- 
-    if (now.hour() == 23 && now.minute() == 59  && now.second() == 59)
-    {
-      Serial.println("Reset");
-      tsec = 0;
-      EEPROM.write(SecEEP, 0); //Reset Sec
-      EEPROM.write(FlowEEP, 0); // Reset Flow
-      EEPROM.write(MinEEP, 0); //Reset min
-      EEPROM.write(HrEEP, 0); // Reset hour
-    }   
-   if(gsmCount==1)
-   {
-       SIM900.println("AT+CSQ");  
-       ShowSerialData();
-        delay(1000);
-   }
-   if(gsmCount==2){
+  Serial.println(sendTot); 
+  if (now.hour() == 23 && now.minute() == 59  && now.second() == 59)
+  {
+    Serial.println("Reset");
+    tsec = 0;
+    EEPROM.write(SecEEP, 0); //Reset Sec
+    EEPROM.write(FlowEEP, 0); // Reset Flow
+    EEPROM.write(MinEEP, 0); //Reset min
+    EEPROM.write(HrEEP, 0); // Reset hour
+  }   
+  if(gsmCount==1)
+  {
+     SIM900.println("AT+CSQ");  
+     ShowSerialData();
+     delay(1000);
+  }
+  if(gsmCount==2)
+  {
     SIM900.println("AT+CGATT?");
     ShowSerialData();
      delay(1000);
-   }
-   if(gsmCount==3){
+  }
+  if(gsmCount==3)
+  {
     SIM900.println("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\"");
     ShowSerialData();
-     delay(1000);
-   }
-   if(gsmCount==4){
+    delay(1000);
+  }
+  if(gsmCount==4)
+  {
     SIM900.println("AT+SAPBR=3,1,\"APN\",\"airtelgprs.com\"");
     ShowSerialData();  
-     delay(1000);            
-    }
-   if(gsmCount==5){
+    delay(1000);            
+  }
+  if(gsmCount==5)
+  {
      SIM900.println("AT+SAPBR=1,1");
      ShowSerialData();
-      delay(1000);                
-    }
-   if(gsmCount==6){
+     delay(1000);                
+  }
+  if(gsmCount==6)
+  {
     SIM900.println("AT+HTTPINIT");
     ShowSerialData(); 
-     delay(1000);
+    delay(1000);
+  }
+  if(gsmCount==7)
+  {
+    if(outputValue>0)
+    {      
+      outputValue= newOut;
     }
-   if(gsmCount==7 ){
-      if(outputValue>0)
-      {      
-        outputValue= newOut;
-      }
-      int id_panel = 889;      
-      int ups = 1;
-      int door = 1;
-      int current_flow = newOut;
-      int total_flow = cumm12 * 100;
-      int panel_lock = 0;
-      int main = 1;
-      int pump = 1 ;
-      int auto_main = 1;
-      int fc = 1;
-      int water_level = 0;
-      int water_level2 = 0 ;
-      
-      String paliString = "AT+HTTPPARA=\"URL\",\"http://59.90.174.164/MICROSCADA/DASERVER.ASPX?";
+    int id_panel = 889;      
+    int ups = 1;
+    int door = 1;
+    int current_flow = newOut;
+    int total_flow = cumm12 * 100;
+    int panel_lock = 0;
+    int main = 1;
+    int pump = 1 ;
+    int auto_main = 1;
+    int fc = 1;
+    int water_level = 0;
+    int water_level2 = 0 ;
+    
+    String paliString = "AT+HTTPPARA=\"URL\",\"http://59.90.174.164/MICROSCADA/DASERVER.ASPX?";
 
-      String ID = "ID=";
-      String A = "A=";
-      String B = "B=";
-      String C = "C=";
-      String D = "D=";
-      String E = "E=";
-      String F = "F=";
-      String G = "G=";
-      String H = "H=";
-      String I = "I=";
-      String J = "J=";
-      String K = "K=";
-      String s = "&";
-      String slash = " \0";
-      String stringPali = paliString + ID + id_panel + s + A + ups + s + B + door + s + C + current_flow + s + D + total_flow + s + E + panel_lock + s + F + main + s + G + pump + s + H + auto_main + s + I + fc + s + J + water_level + s + K + water_level2 + slash;
-      SIM900.println(stringPali);
-     
-      delay(1000);
+    String ID = "ID=";
+    String A = "A=";
+    String B = "B=";
+    String C = "C=";
+    String D = "D=";
+    String E = "E=";
+    String F = "F=";
+    String G = "G=";
+    String H = "H=";
+    String I = "I=";
+    String J = "J=";
+    String K = "K=";
+    String s = "&";
+    String slash = " \0";
+    String stringPali = paliString + ID + id_panel + s + A + ups + s + B + door + s + C + current_flow + s + D + total_flow + s + E + panel_lock + s + F + main + s + G + pump + s + H + auto_main + s + I + fc + s + J + water_level + s + K + water_level2 + slash;
+    SIM900.println(stringPali);   
+    delay(1000);
    }
    if(gsmCount==8)  
-    {
-      SIM900.println("AT+HTTPACTION=0");//submit the request
-      ShowSerialData(); 
-      gsmCount=0;
-      delay(1000);
-    }
-    if(gsmboot==600)  
-    {
-      SIM900.println("AT+CPOWD=0");//submit the request
-      ShowSerialData(); 
-      gsmboot=0;
-      delay(1000);
-    }    
-    if (outputValue<=0)
-    {
+   {
+    SIM900.println("AT+HTTPACTION=0");//submit the request
+    ShowSerialData(); 
+    gsmCount=0;
+    delay(1000);
+   }
+   if(gsmboot==600)  
+   {
+    SIM900.println("AT+CPOWD=0");//submit the request
+    ShowSerialData(); 
+    gsmboot=0;
+    delay(1000);
+   }    
+   if (outputValue<=0)
+   {
       newOut=0;
       lcd.setCursor(0, 0);
       lcd.print("CF=");
@@ -340,48 +344,41 @@ void loop()
       lcd.setCursor(7, 1);
       lcd.print(cumm3, 3);
       delay(10);
-    }
-    if(outputValue>0)
-    {
-      
-
+   }
+   if(outputValue>0)
+   {
       float testValue = outputValue * 100; // 5400
       float ltSec = testValue / 360; // 5.833 Curretn Flow 15
       tsec = ltSec + tsec; // tsec = 46.66+23.33
       sendTot = ltSec +sendTot;
-      cumm3 = (tsec * 0.0099999988)/10;
-       
+      cumm3 = (tsec * 0.0099999988)/10;       
       cumm9 = sendTot * 0.0099999988;
       cumm12 = (cumm9/10);
-     //==================================Send Value in SD Card==============
-                                    
-        Serial.println("*****SD Value Add Start Value of Last ToT=********");
-        
-        SD.remove("file.txt");
-        file = SD.open("file.txt", FILE_WRITE); // open "file.txt" to write data
-        if (file) 
-        {
-          float number = sendTot; // generate random number between 0 and 9
-          file.println(number); // write number to file
-          file.close(); // close file
-          Serial.print("Wrote number: "); // debug output: show written number in serial monitor
-          Serial.println(number);
-        }
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("CF=");
-        lcd.setCursor(5, 0);
-        lcd.print(outputValue);    
-      
-        lcd.setCursor(0, 1);
-        lcd.print("Total =");
-        lcd.setCursor(7, 1);
-        lcd.print(cumm3, 3);
-        delay(10);
-  
-        Serial.println("Last LLOp");
-        Serial.print("Tsec Value test = ");
-        Serial.println(ltSec);
+      //==================================Send Value in SD Card==============
+      Serial.println("*****SD Value Add Start Value of Last ToT=********");
+      SD.remove("file.txt");
+      file = SD.open("file.txt", FILE_WRITE); // open "file.txt" to write data
+      if (file) 
+      {
+        float number = sendTot; // generate random number between 0 and 9
+        file.println(number); // write number to file
+        file.close(); // close file
+        Serial.print("Wrote number: "); // debug output: show written number in serial monitor
+        Serial.println(number);
+      }
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("CF=");
+      lcd.setCursor(5, 0);
+      lcd.print(outputValue);   
+      lcd.setCursor(0, 1);
+      lcd.print("Total =");
+      lcd.setCursor(7, 1);
+      lcd.print(cumm3, 3);
+      delay(10);
+      Serial.println("Last LLOp");
+      Serial.print("Tsec Value test = ");
+      Serial.println(ltSec);
       if (ltSec > 1)
       {
         Serial.println("Testing 1");
@@ -393,11 +390,9 @@ void loop()
       {
         count = 0;
         EEPROM.write(SecEEP, count);
-
         countMin = countMin + 1;
         Serial.print("Count Min= ");
         Serial.println(countMin);
-
         if (countMin == 60)
         {
           countMin = 0;
@@ -415,14 +410,12 @@ void loop()
         EEPROM.write(MinEEP, countMin);
       }
       if (count == 10 && ltSec > 0)
-      {
-        
+      { 
         EEPROM.write(FlowEEP, ltSec);
       }
         
-     }  
-             
-  
+     }
+  Serial.print("Timing : ")    
   Serial.print(now.hour());
   Serial.println("");
   Serial.println(now.minute());
