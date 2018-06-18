@@ -415,7 +415,8 @@ void loop()
       }
         
      }
-  Serial.print("Timing : ")    
+  Serial.print("Timing : ");
+      
   Serial.print(now.hour());
   Serial.println("");
   Serial.println(now.minute());
