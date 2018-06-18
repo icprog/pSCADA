@@ -38,8 +38,8 @@ int HrEEP = 7;
 int FlowEEP = 4;
 int sdStart =0;
 int SDwrite=0;
-float lastTot;
 float sendTot;
+
 int gsmCount = 0; 
 float cumm12,cumm9;
 float cf=0;
@@ -122,7 +122,7 @@ void setup() {
       Serial.print("Totalizer1 Value is :");
       
       sendTot= s ;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
     else if(count3==2)
@@ -133,7 +133,7 @@ void setup() {
       Serial.print("Totalizer2 Value is :");
       
       sendTot= s ;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
     else if(count3==3)
@@ -144,7 +144,7 @@ void setup() {
       Serial.print("Totalizer3 Value is :");
       
       sendTot= s ;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
     else if(count3==4)
@@ -155,7 +155,7 @@ void setup() {
       Serial.print("Totalizer4 Value is :");
       
       sendTot= s ;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
     else if(count3==5)
@@ -166,7 +166,7 @@ void setup() {
       Serial.print("Totalizer5 Value is :");
       
       sendTot= s ;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
     else if(count3==6)
@@ -177,7 +177,7 @@ void setup() {
       Serial.print("Totalizer6 Value is :");
       
       sendTot= s ;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
      else if(count3==7)
@@ -188,7 +188,7 @@ void setup() {
       Serial.print("Totalizer7 Value is :");
       
       sendTot =s;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }
     else if(count3==8)
@@ -199,7 +199,7 @@ void setup() {
       Serial.print("Totalizer8 Value is :");
       
       sendTot =s;
-      Serial.println(lastTot);
+      Serial.println(sendTot);
       count3=0;
     }   
     count2= 0;  
@@ -415,8 +415,7 @@ void loop()
       }
         
      }
-  Serial.print("Timing : ");
-      
+  Serial.print("Timing : ");      
   Serial.print(now.hour());
   Serial.println("");
   Serial.println(now.minute());
