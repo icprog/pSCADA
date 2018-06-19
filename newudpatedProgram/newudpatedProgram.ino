@@ -24,7 +24,7 @@ LiquidCrystal lcd(5, 6, 7, 8, 9, 10);
 int mains = 2;
 int door = 3;
 float count;
-float outputValue = 0;        // value of Flow Meter
+float outputValue;        // value of Flow Meter
 float tsec;
 float test;
 float ltSec;
@@ -56,6 +56,11 @@ float testcumm;
   //String tm = "time=";
   
 //********************
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 void setup() {
   gsmCount=0;
@@ -229,7 +234,9 @@ void loop()
   //-------------------------------- Calculations SCADA -----------------------
   DateTime now = rtc.now();
   float sensorValue = analogRead(A1);
-  outputValue = map(sensorValue,310 , 1023, 0,21); // 21
+  outputValue = mapfloat(sensorValue,220,1056, 0,21); // 21
+  Serial.print("SensorValue ");
+  Serial.println(sensorValue);
   Serial.print("OutputValue ");
   Serial.println(outputValue);
   Serial.print("Tsec ");
