@@ -102,11 +102,7 @@ void draw(float c,float t, float l) {
    u8g.drawStr(0,63, F("Limit.="));
    dtostrf(Limit, 3, 0, Limit_string);
    u8g.drawStr(40,63, Limit_string);
-   
-   
-  
-  // of course, the F() macro can be used directly
-  u8g.undoScale();  
+   u8g.undoScale();  
 }
 
 void setup() {
@@ -379,14 +375,6 @@ void loop()
     SIM900.println(stringPali);   
     delay(1000);
    }
-  /* if(gsmCount==8)  
-   {
-    SIM900.println("AT+HTTPACTION=0");//submit the request
-    ShowSerialData(); 
-    delay(1000);   
-    gsmCount=0;  
-   }   */
-
    if(gsmCount==8)  
    {
     SIM900.println("AT+HTTPACTION=0");//submit the request
@@ -412,17 +400,7 @@ void loop()
    if (outputValue<=0)
    {
       cumm03 = (tsec * 0.0099999988)/10; 
-//      lcd.clear();
       newOut=0;
-//      lcd.setCursor(0, 0);
-//      lcd.print("CF=");
-//      lcd.setCursor(5, 0);
-//      lcd.print(0);
-//      lcd.setCursor(0, 1);
-//      lcd.print("Total =");
-//      lcd.setCursor(7, 1);
-//      lcd.print(cumm03, 3);
-//      delay(10);
           u8g.firstPage();  
         do {
           draw(0,cumm03,l_scada);
@@ -456,16 +434,7 @@ void loop()
         Serial.print("Wrote number: "); // debug output: show written number in serial monitor
         Serial.println(number);
       }
-//      lcd.clear();
-//      lcd.setCursor(0, 0);
-//      lcd.print("CF=");
-//      lcd.setCursor(5, 0);
-//      lcd.print(outputValue);   
-//      lcd.setCursor(0, 1);
-//      lcd.print("Total =");
-//      lcd.setCursor(7, 1);
-//      lcd.print(cumm3, 3);
-          
+
         Serial.print("Cumm3 Value");
         Serial.println(cumm3*100);
       
@@ -586,11 +555,6 @@ void changeLed()
   Serial.println(pstr);
   float k= pstr.toFloat();
   l_scada=k;
-  if (content.substring(32, 35) == "160")
-  {
-    
-
-    
-  }
+  
   content = "";
 }
