@@ -291,7 +291,7 @@ void loop()
   if(gsmCount==7)
   {
     
-    int id_panel = 889;      
+    int id_panel = 889;//890      
     int ups = 1;
     int door = 1;
     int current_flow ;
@@ -335,13 +335,28 @@ void loop()
     SIM900.println(stringPali);   
     delay(1000);
    }
-   if(gsmCount==8)  
+  /* if(gsmCount==8)  
    {
     SIM900.println("AT+HTTPACTION=0");//submit the request
     ShowSerialData(); 
     gsmCount=0;
+    
     delay(1000);
-   }
+   }*/
+   if(gsmCount==8)  
+   {
+    SIM900.println("AT+HTTPACTION=0");//submit the request
+      delay(2000);//the delay is very important, the delay time is base on the return from the website, if the return datas are very large, the time required longer.
+      //while(!SIM900.available());
+      ShowSerialData();
+      SIM900.println("AT+HTTPREAD");// read the data from the website you access
+      delay(100);
+      changeLed();//
+      ShowSerialData();
+      SIM900.println("");
+      //delay(100);
+      gsmCount=0;
+     }
    if(gsmboot==600)  
    {
     SIM900.println("AT+CPOWD=0");//submit the request
@@ -508,8 +523,8 @@ void changeLed()
     content = content + String(char (SIM900.read()));
   }
   Serial.println("30 31 is");
-  Serial.println(content.substring(33, 36));
-  if (content.substring(33, 36) == "400")
+  Serial.println(content.substring(32, 35));
+  if (content.substring(32,35) == "160")
   {
     Serial.println("Yuhuuuuuu");
   }

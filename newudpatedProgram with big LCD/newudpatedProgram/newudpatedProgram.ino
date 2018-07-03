@@ -1,7 +1,7 @@
 #include <SoftwareSerial.h>
 SoftwareSerial SIM900(12, 13);
 #include "U8glib.h"
-U8GLIB_ST7920_128X64 u8g(9,11,10,U8G_PIN_NONE);
+U8GLIB_ST7920_128X64 u8g(8,7,6,U8G_PIN_NONE);
 #include <EEPROM.h>
 //-------------SD Card Header(50,51,52,53(CS))---------------
 #include <SD.h>
@@ -13,6 +13,7 @@ int count1,count3;
 int count2 = 0;
 float newOut=0;
 float cumm03;
+int l_scada;
 //------------------------------------------
 #include<Wire.h>
 //----------------------RTC Header-------------------------------
@@ -20,8 +21,7 @@ float cumm03;
 RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 //-------------------------LCD Header ------------------------
-#include <LiquidCrystal.h>
-LiquidCrystal lcd(5, 6, 7, 8, 9, 10);
+
 //----------------------------------------------------------
 int mains = 2;
 int door = 3;
@@ -57,42 +57,56 @@ float testcumm;
   //String nu = "num=";
   //String tm = "time=";
   
-//********************
-
+//********************BIG LCD Char****************
+char Current_string[5];
+char Total_string[5];
+char Limit_string[5];
+///*************************************************
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-void draw(float o, float t) {
+void draw(float c,float t, float l) {
+  
+  float Current =c;
+  float Total = t;
+  float Limit = l;
+  
 
-  // graphic commands to redraw the complete screen should be placed here  
-  
-  // assign default font
-  u8g.setFont(u8g_font_unifont);
-  
+  //u8g.setFont(u8g_font_unifont);
+  u8g.setFont (u8g_font_6x12);
   // pointer to strings in flash memory can be stored in a special type
   const __FlashStringHelper *flash_ptr;
   
   // the result of the F() macro can be assigned to this pointer
-  //flash_ptr = F("VISION WORLD ");
-  flash_ptr = F(o);
+  flash_ptr = F("VISION WORLD TECH");
+  
   
   // this pointer can be used as argument to the draw procedures
  // u8g.drawStr( 0+1, 20+1, flash_ptr);
   u8g.drawStr( 0, 10, flash_ptr);
   
-  u8g.drawStr( 20, 25, F("TECH PVT.LTD."));
+  u8g.drawStr( 20, 25, F("PVT.LTD.(JAIPUR)"));
    u8g.drawHLine(0, 25, 140);
    
    
    u8g.drawStr(0,37, F("C.F.="));
-   //u8g.drawStr(10,37, F(o));
+   dtostrf(Current, 3, 0, Current_string);
+   u8g.drawStr(30,37, Current_string);
+   
    u8g.drawStr(0,50, F("T.F.="));
-   //u8g.drawStr(10,50, F(t));
+   dtostrf(Total, 3, 3, Total_string);
+   u8g.drawStr(30,50, Total_string);
+
+   
    u8g.drawStr(0,63, F("Limit.="));
+   dtostrf(Limit, 3, 0, Limit_string);
+   u8g.drawStr(40,63, Limit_string);
+   
+   
+  
   // of course, the F() macro can be used directly
   u8g.undoScale();  
-
 }
 
 void setup() {
@@ -106,7 +120,7 @@ void setup() {
   countMin = EEPROM.read(MinEEP);
   count = EEPROM.read(SecEEP);
   countHr = EEPROM.read(HrEEP);
-  lcd.begin(16, 2);
+ 
   float sec = EEPROM.read(SecEEP);
   float minut = EEPROM.read(MinEEP);
   float cflow = EEPROM.read(FlowEEP);
@@ -247,18 +261,10 @@ void setup() {
     file.close();
     Serial.println("*****SD Value Extracting END********");
     }
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("CF=");
-    lcd.setCursor(5, 0);
-    lcd.print(outputValue);
-    lcd.setCursor(0, 1);
-    lcd.print("Total =");
-    lcd.setCursor(7, 1);
-    lcd.print(tsec, 3);
+    
     u8g.firstPage();  
     do {
-      draw(outputValue,tsec);
+      draw(outputValue,tsec,l_scada);
     } while( u8g.nextPage() );
     delay(10);
     
@@ -341,8 +347,7 @@ void loop()
     }
     if(outputValue<0)
     {
-      current_flow= 0;
-      
+      current_flow= 0;      
     }
     
     int total_flow = cumm12 * 100;
@@ -374,13 +379,29 @@ void loop()
     SIM900.println(stringPali);   
     delay(1000);
    }
-   if(gsmCount==8)  
+  /* if(gsmCount==8)  
    {
     SIM900.println("AT+HTTPACTION=0");//submit the request
     ShowSerialData(); 
-    gsmCount=0;
-    delay(1000);
-   }
+    delay(1000);   
+    gsmCount=0;  
+   }   */
+
+   if(gsmCount==8)  
+   {
+    SIM900.println("AT+HTTPACTION=0");//submit the request
+      delay(2000);//the delay is very important, the delay time is base on the return from the website, if the return datas are very large, the time required longer.
+      //while(!SIM900.available());
+      ShowSerialData();
+      SIM900.println("AT+HTTPREAD");// read the data from the website you access
+      delay(100);
+      changeLed();//
+      ShowSerialData();
+      SIM900.println("");
+      //delay(100);
+      gsmCount=0;
+     }
+   
    if(gsmboot==600)  
    {
     SIM900.println("AT+CPOWD=0");//submit the request
@@ -391,17 +412,22 @@ void loop()
    if (outputValue<=0)
    {
       cumm03 = (tsec * 0.0099999988)/10; 
-      lcd.clear();
+//      lcd.clear();
       newOut=0;
-      lcd.setCursor(0, 0);
-      lcd.print("CF=");
-      lcd.setCursor(5, 0);
-      lcd.print(0);
-      lcd.setCursor(0, 1);
-      lcd.print("Total =");
-      lcd.setCursor(7, 1);
-      lcd.print(cumm03, 3);
-      delay(10);
+//      lcd.setCursor(0, 0);
+//      lcd.print("CF=");
+//      lcd.setCursor(5, 0);
+//      lcd.print(0);
+//      lcd.setCursor(0, 1);
+//      lcd.print("Total =");
+//      lcd.setCursor(7, 1);
+//      lcd.print(cumm03, 3);
+//      delay(10);
+          u8g.firstPage();  
+        do {
+          draw(0,cumm03,l_scada);
+        } while( u8g.nextPage() );
+        delay(10);
    }
    if(outputValue>0)
    {
@@ -409,9 +435,14 @@ void loop()
       float ltSec = testValue / 360; // 5.833 Curretn Flow 15
       tsec = ltSec + tsec; // tsec = 46.66+23.33
       sendTot = ltSec +sendTot;
-      cumm3 = (tsec * 0.0099999988)/10;       
+      cumm3 = (tsec * 0.0099999988)/10;   
+      // cumm03 = (tsec * 0.0099999988)/10;     
       cumm9 = sendTot * 0.0099999988;
       cumm12 = (cumm9/10);
+      u8g.firstPage();  
+        do {
+          draw(outputValue,cumm3,l_scada);
+        } while( u8g.nextPage() );
       
       //==================================Send Value in SD Card==============
       Serial.println("*****SD Value Add Start Value of Last ToT=********");
@@ -425,15 +456,18 @@ void loop()
         Serial.print("Wrote number: "); // debug output: show written number in serial monitor
         Serial.println(number);
       }
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("CF=");
-      lcd.setCursor(5, 0);
-      lcd.print(outputValue);   
-      lcd.setCursor(0, 1);
-      lcd.print("Total =");
-      lcd.setCursor(7, 1);
-      lcd.print(cumm3, 3);
+//      lcd.clear();
+//      lcd.setCursor(0, 0);
+//      lcd.print("CF=");
+//      lcd.setCursor(5, 0);
+//      lcd.print(outputValue);   
+//      lcd.setCursor(0, 1);
+//      lcd.print("Total =");
+//      lcd.setCursor(7, 1);
+//      lcd.print(cumm3, 3);
+          
+        Serial.print("Cumm3 Value");
+        Serial.println(cumm3*100);
       
       delay(10);
       Serial.println("Last LLOp");
@@ -547,10 +581,16 @@ void changeLed()
     content = content + String(char (SIM900.read()));
   }
   Serial.println("30 31 is");
-  Serial.println(content.substring(33, 36));
-  if (content.substring(33, 36) == "400")
+  Serial.println(content.substring(32, 35));
+  String pstr = content.substring(32,33)+content.substring(33,34)+content.substring(34,35);
+  Serial.println(pstr);
+  float k= pstr.toFloat();
+  l_scada=k;
+  if (content.substring(32, 35) == "160")
   {
-    Serial.println("Yuhuuuuuu");
+    
+
+    
   }
   content = "";
 }
