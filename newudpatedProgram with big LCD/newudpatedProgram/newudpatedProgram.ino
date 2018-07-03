@@ -554,6 +554,7 @@ void changeLed()
   String pstr = content.substring(32,33)+content.substring(33,34)+content.substring(34,35);
   Serial.println(pstr);
   float k= pstr.toFloat();
+  if(k>0)
   l_scada=k;
   
   content = "";
